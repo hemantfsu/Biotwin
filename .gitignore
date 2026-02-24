@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Environment
+.env
+.env.local
+
+# Build outputs
+frontend/build/
+dist/
+
+# Model artefacts (large files)
+models/*.pkl
+models/*.h5
+models/*.tflite
+ml-server/models/*.pkl
+ml-server/models/*.h5
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Training outputs
+ml-server/outputs/
