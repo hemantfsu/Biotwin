@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AuthProvider, useAuth } from './services/AuthContext';
+import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
 import Chatbot from './components/Chatbot';
 import Login from './pages/Login';
@@ -14,7 +15,7 @@ import HealthDiagnosis from './pages/HealthDiagnosis';
 import LiveVitals from './pages/LiveVitals';
 
 const pageVariants = {
-  initial: { opacity: 0, y: 16 },
+  initial: { opacity: 0, y: 12 },
   in: { opacity: 1, y: 0 },
   out: { opacity: 0, y: -8 },
 };
@@ -32,9 +33,9 @@ function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
   if (loading)
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex items-center justify-center h-screen bg-dark-900">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-brand-200 border-t-brand-500 rounded-full animate-spin" />
+          <div className="w-12 h-12 border-4 border-dark-600 border-t-accent-cyan rounded-full animate-spin" />
           <p className="text-sm font-medium text-slate-500">Loading BioTwin…</p>
         </div>
       </div>
@@ -67,11 +68,14 @@ function AppRoutes() {
   const { user } = useAuth();
 
   return (
-    <div className="min-h-screen">
-      {user && <Navbar />}
-      <main className={user ? 'pt-6 pb-12 px-4 md:px-8 lg:px-12' : ''}>
-        <AnimatedRoutes />
-      </main>
+    <div className="min-h-screen bg-dark-900">
+      {user && <Sidebar />}
+      <div className={user ? 'md:ml-[220px] min-h-screen flex flex-col' : ''}>
+        {user && <Navbar />}
+        <main className={user ? 'flex-1 p-4 md:p-6 lg:p-8' : ''}>
+          <AnimatedRoutes />
+        </main>
+      </div>
       {user && <Chatbot />}
     </div>
   );

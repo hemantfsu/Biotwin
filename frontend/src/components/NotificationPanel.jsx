@@ -2,10 +2,10 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const severityConfig = {
-  critical: { bg: 'bg-red-50/80', border: 'border-red-200', text: 'text-red-700', badge: 'bg-red-100 text-red-700', icon: '🚨' },
-  high: { bg: 'bg-orange-50/80', border: 'border-orange-200', text: 'text-orange-700', badge: 'bg-orange-100 text-orange-700', icon: '⚠️' },
-  moderate: { bg: 'bg-amber-50/80', border: 'border-amber-200', text: 'text-amber-700', badge: 'bg-amber-100 text-amber-700', icon: '⚠️' },
-  low: { bg: 'bg-blue-50/80', border: 'border-blue-200', text: 'text-blue-700', badge: 'bg-blue-100 text-blue-700', icon: 'ℹ️' },
+  critical: { bg: 'bg-red-500/8', border: 'border-red-500/20', text: 'text-red-400', badge: 'bg-red-500/15 text-red-400', icon: '🚨' },
+  high: { bg: 'bg-orange-500/8', border: 'border-orange-500/20', text: 'text-orange-400', badge: 'bg-orange-500/15 text-orange-400', icon: '⚠️' },
+  moderate: { bg: 'bg-amber-500/8', border: 'border-amber-500/20', text: 'text-amber-400', badge: 'bg-amber-500/15 text-amber-400', icon: '⚠️' },
+  low: { bg: 'bg-blue-500/8', border: 'border-blue-500/20', text: 'text-blue-400', badge: 'bg-blue-500/15 text-blue-400', icon: 'ℹ️' },
 };
 
 export default function NotificationPanel({ alerts = [] }) {

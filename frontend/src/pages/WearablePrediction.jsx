@@ -1,133 +1,138 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import api from '../services/api';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+
+function generateSample() {
+  const steps = 24;
+  const data = [];
+  for (let i = 0; i < steps; i++) {
+    data.push({
+      heart_rate: +(65 + Math.random() * 30).toFixed(1),
+      spo2: +(95 + Math.random() * 4).toFixed(1),
+      systolic_bp: +(110 + Math.random() * 30).toFixed(1),
+      diastolic_bp: +(65 + Math.random() * 20).toFixed(1),
+      temperature: +(36.2 + Math.random() * 1.5).toFixed(1),
+      respiratory_rate: +(14 + Math.random() * 8).toFixed(1),
+    });
+  }
+  return data;
+}
 
 export default function WearablePrediction() {
-  const [jsonInput, setJsonInput] = useState('');
+  const [jsonText, setJsonText] = useState('');
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const generateSample = () => {
-    const data = Array.from({ length: 24 }, (_, i) => ({
-      heart_rate: 65 + Math.floor(Math.random() * 30),
-      spo2: 94 + Math.floor(Math.random() * 6),
-      steps: Math.floor(Math.random() * 500),
-    }));
-    setJsonInput(JSON.stringify(data, null, 2));
+  const handleSample = () => {
+    const sample = generateSample();
+    setJsonText(JSON.stringify(sample, null, 2));
   };
 
-  const submit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      const parsed = JSON.parse(jsonInput);
-      const res = await api.post('/predict/wearable', { readings: parsed });
-      const record = res.data.data;
-      setResult({
-        risk_percent: (record.prediction.riskScore * 100),
-        risk_label: record.prediction.riskLevel,
-        confidence: record.prediction.confidence,
-        trend_analysis: record.explanation?.risk_trend || {},
-      });
+      const readings = JSON.parse(jsonText);
+      const res = await api.post('/predict/wearable', { readings });
+      setResult(res.data);
     } catch (err) {
-      setError(err.response?.data?.detail || err.message || 'Prediction failed');
+      if (err instanceof SyntaxError) setError('Invalid JSON format');
+      else setError(err.response?.data?.error || 'Prediction failed');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
-  const chartData = result?.trend_analysis
-    ? Object.entries(result.trend_analysis).map(([name, val]) => ({
-        name: name.replace(/_/g, ' '),
-        value: typeof val === 'number' ? val : 0,
-      }))
+  const trendData = result?.trend_analysis
+    ? result.trend_analysis.map((t, i) => ({ step: i + 1, ...t }))
     : [];
 
-  const riskColor = result?.risk_percent > 60 ? '#ef4444' : result?.risk_percent > 30 ? '#f59e0b' : '#10b981';
-  const riskBg = result?.risk_percent > 60 ? 'from-red-50 to-rose-50 border-red-200' : result?.risk_percent > 30 ? 'from-amber-50 to-yellow-50 border-amber-200' : 'from-emerald-50 to-green-50 border-green-200';
-
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      <div className="flex items-center gap-3 mb-1">
-        <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-xl">📱</div>
-        <div>
-          <h1 className="page-title">Wearable Prediction</h1>
-          <p className="page-subtitle">Bidirectional LSTM time-series health risk forecasting</p>
-        </div>
-      </div>
+    <div className="max-w-5xl mx-auto space-y-6">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+        <p className="text-accent-cyan/60 text-xs font-semibold uppercase tracking-widest mb-1">Wearable AI Module</p>
+        <h1 className="text-2xl font-extrabold text-white">📱 Wearable LSTM Prediction</h1>
+        <p className="text-slate-400 text-sm mt-1">Time-series deep learning with 24-step sensor data</p>
+      </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Input */}
-        <div className="glass-card-static p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="font-bold text-slate-800 text-sm">Sensor Data (24 timesteps)</h2>
-            <button onClick={generateSample} className="text-xs font-semibold text-brand-500 hover:text-brand-600 bg-brand-50 px-3 py-1.5 rounded-lg hover:bg-brand-100 transition">
-              ✨ Generate sample
-            </button>
-          </div>
-          <textarea
-            value={jsonInput}
-            onChange={(e) => setJsonInput(e.target.value)}
-            rows={14}
-            className="w-full text-xs font-mono bg-slate-900/95 text-emerald-300 border border-slate-700 rounded-xl p-4 focus:ring-2 focus:ring-brand-400/40 focus:outline-none resize-none leading-relaxed"
-            placeholder='[{"heart_rate":72,"spo2":98,"steps":150}, ...]'
-          />
-          <button
-            onClick={submit}
-            disabled={loading || !jsonInput.trim()}
-            className="w-full mt-4 btn-primary !bg-gradient-to-r !from-blue-500 !to-cyan-500 !shadow-blue-500/25 hover:!shadow-blue-500/40"
-          >
-            {loading ? (
-              <span className="flex items-center justify-center gap-2">
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Predicting…
-              </span>
-            ) : '📊 Predict Health Risk'}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
+        className="dark-card-static p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-bold text-white text-sm">Sensor Readings (JSON)</h2>
+          <button onClick={handleSample} type="button"
+            className="text-xs font-semibold text-accent-cyan hover:text-accent-cyan/80 transition-colors">
+            Generate 24-Step Sample
           </button>
-          {error && <p className="text-red-500 text-sm mt-3 font-medium">{error}</p>}
         </div>
 
-        {/* Results */}
-        <AnimatePresence mode="wait">
-          {result && (
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="space-y-4"
-            >
-              <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${riskBg} border p-6 text-center`}>
-                <div className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-10" style={{ background: riskColor }} />
-                <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Health Risk Score</p>
-                <p className="text-6xl font-black mt-3 tabular-nums" style={{ color: riskColor }}>
-                  {result.risk_percent?.toFixed(1)}%
-                </p>
-                <p className="text-sm text-slate-500 mt-2 capitalize font-medium">{result.risk_label}</p>
-              </div>
-
-              {chartData.length > 0 && (
-                <div className="glass-card-static p-5">
-                  <div className="flex items-center gap-2 mb-4">
-                    <span className="text-sm">📈</span>
-                    <h3 className="text-sm font-bold text-slate-700">Trend Analysis</h3>
-                  </div>
-                  <ResponsiveContainer width="100%" height={200}>
-                    <LineChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
-                      <XAxis dataKey="name" tick={{ fontSize: 9, fill: '#94a3b8' }} axisLine={false} />
-                      <YAxis tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} />
-                      <Tooltip
-                        contentStyle={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(8px)', border: '1px solid rgba(226,232,240,0.8)', borderRadius: '12px', fontSize: '12px' }}
-                      />
-                      <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2.5} dot={{ r: 4, fill: '#3b82f6', stroke: '#fff', strokeWidth: 2 }} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              )}
-            </motion.div>
+        <form onSubmit={handleSubmit}>
+          <textarea
+            rows={12}
+            value={jsonText}
+            onChange={(e) => setJsonText(e.target.value)}
+            placeholder='[{"heart_rate":72,"spo2":98,"systolic_bp":120,"diastolic_bp":80,"temperature":36.6,"respiratory_rate":16}, ...]'
+            className="input-dark font-mono text-xs leading-relaxed resize-y"
+            required
+          />
+          {error && (
+            <div className="mt-3 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">{error}</div>
           )}
-        </AnimatePresence>
-      </div>
+          <button type="submit" disabled={loading} className="btn-primary mt-4 w-full disabled:opacity-50">
+            {loading ? 'Processing…' : 'Run LSTM Analysis'}
+          </button>
+        </form>
+      </motion.div>
+
+      <AnimatePresence>
+        {result && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+            className="space-y-4">
+            <div className={`dark-card-static p-6 border-l-4 ${
+              result.risk_percent >= 50 ? 'border-l-red-500' : 'border-l-emerald-500'
+            }`}>
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1">Health Risk</p>
+                  <h3 className="text-3xl font-black" style={{ color: result.risk_percent >= 50 ? '#ef4444' : '#10b981' }}>
+                    {result.risk_percent?.toFixed(1)}%
+                  </h3>
+                  <p className="text-sm font-semibold mt-1" style={{ color: result.risk_percent >= 50 ? '#ef4444' : '#10b981' }}>
+                    {result.risk_label}
+                  </p>
+                </div>
+                <div className="bg-dark-700/50 rounded-xl p-4 md:text-right">
+                  <p className="text-xs text-slate-500 mb-1">Confidence</p>
+                  <p className="text-2xl font-bold text-white">{(result.confidence * 100)?.toFixed(1)}%</p>
+                </div>
+              </div>
+            </div>
+
+            {trendData.length > 0 && (
+              <div className="dark-card-static p-6">
+                <h3 className="font-bold text-white text-sm mb-1">Trend Analysis</h3>
+                <p className="text-xs text-slate-500 mb-4">Vital sign trends over the 24-step window</p>
+                <ResponsiveContainer width="100%" height={280}>
+                  <LineChart data={trendData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(100,116,139,0.1)" />
+                    <XAxis dataKey="step" tick={{ fill: '#64748b', fontSize: 10 }} axisLine={false} />
+                    <YAxis tick={{ fill: '#64748b', fontSize: 10 }} axisLine={false} />
+                    <Tooltip
+                      contentStyle={{ backgroundColor: '#1a1d2e', border: '1px solid rgba(100,116,139,0.2)', borderRadius: 12, fontSize: 11 }}
+                      labelStyle={{ color: '#94a3b8' }}
+                    />
+                    <Line type="monotone" dataKey="heart_rate" stroke="#ef4444" strokeWidth={2} dot={false} name="Heart Rate" />
+                    <Line type="monotone" dataKey="spo2" stroke="#3b82f6" strokeWidth={2} dot={false} name="SpO2" />
+                    <Line type="monotone" dataKey="systolic_bp" stroke="#f59e0b" strokeWidth={2} dot={false} name="Systolic BP" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

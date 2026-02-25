@@ -4,125 +4,105 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../services/AuthContext';
 
 export default function Login() {
-  const { login } = useAuth();
-  const navigate = useNavigate();
-  const [form, setForm] = useState({ email: '', password: '' });
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      await login(form.email, form.password);
+      await login(email, password);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.error || 'Login failed');
+      setError(err.response?.data?.error || 'Login failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
-      {/* Animated background */}
-      <div className="blob-bg">
-        <div className="blob blob-1 animate-blob" />
-        <div className="blob blob-2 animate-blob" style={{ animationDelay: '2s' }} />
-        <div className="blob blob-3 animate-blob" style={{ animationDelay: '4s' }} />
-      </div>
+    <div className="min-h-screen flex items-center justify-center bg-dark-900 px-4">
+      {/* Background blobs */}
+      <div className="blob w-96 h-96 bg-accent-cyan/5 top-20 left-10" />
+      <div className="blob w-80 h-80 bg-accent-purple/5 bottom-20 right-10" />
 
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        className="w-full max-w-md mx-4 relative z-10"
+        transition={{ duration: 0.5 }}
+        className="relative w-full max-w-md"
       >
-        {/* Logo */}
-        <div className="text-center mb-10">
-          <motion.div
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500 to-purple-600 text-white text-3xl shadow-float mb-4"
-          >
-            🧬
-          </motion.div>
-          <h1 className="text-3xl font-extrabold bg-gradient-to-r from-brand-600 via-purple-600 to-brand-600 bg-clip-text text-transparent">
-            BioTwin AI
+        {/* Logo / Brand */}
+        <div className="text-center mb-8">
+          <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-accent-cyan to-emerald-500 flex items-center justify-center shadow-lg shadow-accent-cyan/20">
+            <span className="text-2xl">🧬</span>
+          </div>
+          <h1 className="text-2xl font-extrabold text-white tracking-tight">
+            BioTwin <span className="text-accent-cyan">AI</span>
           </h1>
-          <p className="text-slate-400 mt-2 text-sm font-medium">Multi-Modal Early Disease Detection</p>
+          <p className="text-slate-500 text-sm mt-1">Your Digital Health Twin</p>
         </div>
 
         {/* Card */}
-        <div className="bg-white/80 backdrop-blur-2xl rounded-3xl shadow-float border border-white/60 p-8">
-          <h2 className="text-xl font-bold text-slate-800 mb-1">Welcome back</h2>
-          <p className="text-sm text-slate-400 mb-6">Sign in to your health dashboard</p>
+        <div className="dark-card-static p-8">
+          <h2 className="text-xl font-bold text-white mb-1">Welcome back</h2>
+          <p className="text-slate-500 text-sm mb-6">Sign in to access your health dashboard</p>
 
           {error && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-red-50 border border-red-200/80 text-red-600 px-4 py-3 rounded-xl mb-4 text-sm font-medium flex items-center gap-2"
-            >
-              <span>⚠️</span> {error}
+            <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
+              className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+              {error}
             </motion.div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Email</label>
+              <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Email</label>
               <input
                 type="email"
                 required
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                className="input-modern"
-                placeholder="demo@biotwin.ai"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                className="input-dark"
               />
             </div>
-
             <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Password</label>
+              <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Password</label>
               <input
                 type="password"
                 required
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-                className="input-modern"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
+                className="input-dark"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="btn-primary w-full py-3.5 text-sm mt-2"
+              className="btn-primary w-full mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" /></svg>
                   Signing in…
                 </span>
-              ) : (
-                'Sign In →'
-              )}
+              ) : 'Sign In'}
             </button>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-slate-100 text-center">
-            <p className="text-sm text-slate-400">
-              Don't have an account?{' '}
-              <Link to="/register" className="font-semibold text-brand-600 hover:text-brand-700 transition">
-                Create one
-              </Link>
-            </p>
-          </div>
+          <p className="mt-6 text-center text-sm text-slate-500">
+            Don't have an account?{' '}
+            <Link to="/register" className="text-accent-cyan font-semibold hover:underline">Create account</Link>
+          </p>
         </div>
-
-        <p className="text-center text-xs text-slate-300 mt-6">
-          Demo: demo@biotwin.ai / demo123456
-        </p>
       </motion.div>
     </div>
   );

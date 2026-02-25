@@ -6,7 +6,7 @@ function ScoreRing({ score }) {
   const circumference = 2 * Math.PI * radius;
   const progress = (score / 100) * circumference;
   const color = score >= 80 ? '#10b981' : score >= 60 ? '#f59e0b' : '#ef4444';
-  const bgColor = score >= 80 ? '#d1fae5' : score >= 60 ? '#fef3c7' : '#fee2e2';
+  const bgColor = 'rgba(100,116,139,0.1)';
 
   return (
     <div className="relative inline-flex items-center justify-center">
@@ -41,7 +41,7 @@ export default function DiagnosisReport({ report }) {
   if (!report) return null;
 
   return (
-    <div className="glass-card-static p-6 space-y-8">
+    <div className="dark-card-static p-6 space-y-8">
       {/* Health score ring */}
       <div className="text-center">
         <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Overall Health Score</p>
@@ -59,19 +59,19 @@ export default function DiagnosisReport({ report }) {
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.1 }}
-                className="flex items-center justify-between bg-slate-50/80 rounded-xl px-4 py-3.5 border border-slate-100 hover:bg-slate-100/80 transition"
+                className="flex items-center justify-between bg-dark-700/40 rounded-xl px-4 py-3.5 border border-dark-600/30 hover:bg-dark-700/60 transition"
               >
                 <div className="min-w-0 flex-1">
-                  <p className="font-bold text-sm text-slate-800">{c.name}</p>
+                  <p className="font-bold text-sm text-white">{c.name}</p>
                   <p className="text-xs text-slate-400 mt-0.5">{c.description}</p>
                 </div>
                 <span
                   className={`badge ml-3 ${
                     c.severity === 'critical'
-                      ? 'bg-red-100 text-red-700'
+                      ? 'bg-red-500/15 text-red-400'
                       : c.severity === 'high'
-                      ? 'bg-orange-100 text-orange-700'
-                      : 'bg-amber-100 text-amber-700'
+                      ? 'bg-orange-500/15 text-orange-400'
+                      : 'bg-amber-500/15 text-amber-400'
                   }`}
                 >
                   {c.severity}
@@ -93,7 +93,7 @@ export default function DiagnosisReport({ report }) {
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.05 }}
-                className="flex items-start gap-3 text-sm text-slate-600 bg-emerald-50/60 rounded-xl px-4 py-3 border border-emerald-100"
+                className="flex items-start gap-3 text-sm text-slate-300 bg-emerald-500/8 rounded-xl px-4 py-3 border border-emerald-500/15"
               >
                 <span className="text-emerald-500 mt-0.5 text-xs font-bold">✓</span>
                 <span className="leading-relaxed">{r}</span>
