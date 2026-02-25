@@ -1,15 +1,21 @@
 const mongoose = require('mongoose');
 
 /**
- * Connect to MongoDB Atlas.
+ * Connect to MongoDB (supports Railway MONGO_URL & standard MONGO_URI).
  * Retries up to 5 times with exponential back-off.
  */
 const connectDB = async () => {
   const MAX_RETRIES = 5;
+  const uri = process.env.MONGO_URI || process.env.MONGO_URL;
+
+  if (!uri) {
+    console.error('🛑 No MONGO_URI or MONGO_URL set. Exiting.');
+    process.exit(1);
+  }
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
-      const conn = await mongoose.connect(process.env.MONGO_URI, {
+      const conn = await mongoose.connect(uri, {
         // Mongoose 8 uses the new URL parser & unified topology by default
       });
 
