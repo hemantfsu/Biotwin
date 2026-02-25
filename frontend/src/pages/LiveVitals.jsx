@@ -4,7 +4,7 @@ import { AreaChart, Area, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveCont
 import io from 'socket.io-client';
 import api from '../services/api';
 
-const WS_URL = process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:5000';
+const WS_URL = process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:5001';
 
 const VITAL_CARDS = [
   { key: 'heartRate', label: 'Heart Rate', unit: 'bpm', icon: '❤️', color: '#ef4444', min: 60, max: 100 },
@@ -29,10 +29,13 @@ export default function LiveVitals() {
     const socket = io(WS_URL, { transports: ['websocket', 'polling'] });
     socketRef.current = socket;
 
-    socket.on('connect', () => setConnected(true));
+    socket.on('connect', () => {
+      setConnected(true);
+      socket.emit('join:feed');
+    });
     socket.on('disconnect', () => setConnected(false));
 
-    socket.on('vitals:update', (data) => {
+    socket.on('vitals:new', (data) => {
       setVitals(data);
       setHistory((h) => [...h.slice(-59), { ...data, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) }]);
     });
