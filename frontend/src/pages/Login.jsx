@@ -8,8 +8,13 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, demoLogin } = useAuth();
   const navigate = useNavigate();
+
+  const handleDemo = () => {
+    demoLogin();
+    navigate('/dashboard');
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -98,7 +103,19 @@ export default function Login() {
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-slate-500">
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-dark-600" /></div>
+            <div className="relative flex justify-center text-xs"><span className="bg-dark-700 px-3 text-slate-500">or</span></div>
+          </div>
+
+          <button
+            onClick={handleDemo}
+            className="w-full py-2.5 rounded-xl border border-accent-cyan/30 text-accent-cyan font-semibold text-sm hover:bg-accent-cyan/10 transition-all duration-200 flex items-center justify-center gap-2"
+          >
+            🚀 Try Demo (No Login Required)
+          </button>
+
+          <p className="mt-5 text-center text-sm text-slate-500">
             Don't have an account?{' '}
             <Link to="/register" className="text-accent-cyan font-semibold hover:underline">Create account</Link>
           </p>
