@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+// In production: use REACT_APP_API_URL env var set at build time
+// In development: fallback to local backend
 const API_BASE = process.env.REACT_APP_API_URL || `http://${window.location.hostname}:5001/api`;
 
 const api = axios.create({

@@ -26,9 +26,29 @@ const PORT = process.env.PORT || 5001;
 // ── Global middleware ──
 app.use(helmet());
 app.use(compression());
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'http://localhost:3000',
+  'http://localhost:5173',
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: true,  // Allow all origins (Android app + local network + frontend)
+    origin: (origin, cb) => {
+      // Allow requests with no origin (mobile apps, curl, server-to-server)
+      if (!origin) return cb(null, true);
+      // Allow any *.vercel.app or listed origins
+      if (
+        allowedOrigins.includes(origin) ||
+        origin.endsWith('.vercel.app') ||
+        origin.endsWith('.onrender.com')
+      ) {
+        return cb(null, true);
+      }
+      // In development allow everything
+      if (process.env.NODE_ENV !== 'production') return cb(null, true);
+      cb(new Error('CORS not allowed'));
+    },
     credentials: true,
   })
 );
@@ -103,7 +123,10 @@ const start = async () => {
   // ── Socket.IO for real-time vitals ──
   const io = new SocketIO(server, {
     cors: {
-      origin: true,  // Allow all origins for real-time connections
+      origin: (origin, cb) => {
+        // Allow all origins for real-time connections (mobile, web, dev)
+        cb(null, true);
+      },
       credentials: true,
     },
     pingTimeout: 60000,

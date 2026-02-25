@@ -4,6 +4,7 @@ import { AreaChart, Area, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveCont
 import io from 'socket.io-client';
 import api from '../services/api';
 
+// In production REACT_APP_API_URL = https://biotwin-backend.onrender.com/api
 const WS_URL = process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:5001';
 
 const VITAL_CARDS = [
