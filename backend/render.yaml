@@ -1,0 +1,19 @@
+# Render Blueprint — Backend (Node.js)
+services:
+  - type: web
+    name: biotwin-backend
+    runtime: node
+    plan: free
+    region: oregon
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: ML_SERVER_URL
+        sync: false

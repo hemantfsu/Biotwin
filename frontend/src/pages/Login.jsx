@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useAuth } from '../services/AuthContext';
 
 export default function Login() {
@@ -23,45 +24,72 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-black text-indigo-600 flex items-center justify-center gap-3">
-            <span className="text-5xl">🧬</span> BioTwin AI
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
+      {/* Animated background */}
+      <div className="blob-bg">
+        <div className="blob blob-1 animate-blob" />
+        <div className="blob blob-2 animate-blob" style={{ animationDelay: '2s' }} />
+        <div className="blob blob-3 animate-blob" style={{ animationDelay: '4s' }} />
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className="w-full max-w-md mx-4 relative z-10"
+      >
+        {/* Logo */}
+        <div className="text-center mb-10">
+          <motion.div
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500 to-purple-600 text-white text-3xl shadow-float mb-4"
+          >
+            🧬
+          </motion.div>
+          <h1 className="text-3xl font-extrabold bg-gradient-to-r from-brand-600 via-purple-600 to-brand-600 bg-clip-text text-transparent">
+            BioTwin AI
           </h1>
-          <p className="text-gray-500 mt-2">Multi-Modal Early Disease Detection</p>
+          <p className="text-slate-400 mt-2 text-sm font-medium">Multi-Modal Early Disease Detection</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl border p-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">Sign In</h2>
+        {/* Card */}
+        <div className="bg-white/80 backdrop-blur-2xl rounded-3xl shadow-float border border-white/60 p-8">
+          <h2 className="text-xl font-bold text-slate-800 mb-1">Welcome back</h2>
+          <p className="text-sm text-slate-400 mb-6">Sign in to your health dashboard</p>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-4 text-sm">
-              {error}
-            </div>
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-red-50 border border-red-200/80 text-red-600 px-4 py-3 rounded-xl mb-4 text-sm font-medium flex items-center gap-2"
+            >
+              <span>⚠️</span> {error}
+            </motion.div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Email</label>
               <input
                 type="email"
                 required
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
-                className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-300 focus:outline-none"
+                className="input-modern"
                 placeholder="demo@biotwin.ai"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+              <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Password</label>
               <input
                 type="password"
                 required
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
-                className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-300 focus:outline-none"
+                className="input-modern"
                 placeholder="••••••••"
               />
             </div>
@@ -69,18 +97,33 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-3 rounded-xl font-semibold hover:from-indigo-600 hover:to-purple-700 transition disabled:opacity-50"
+              className="btn-primary w-full py-3.5 text-sm mt-2"
             >
-              {loading ? 'Signing in…' : 'Sign In'}
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Signing in…
+                </span>
+              ) : (
+                'Sign In →'
+              )}
             </button>
           </form>
 
-          <p className="text-center text-sm text-gray-500 mt-6">
-            Don't have an account?{' '}
-            <Link to="/register" className="text-indigo-600 font-medium hover:underline">Register</Link>
-          </p>
+          <div className="mt-6 pt-6 border-t border-slate-100 text-center">
+            <p className="text-sm text-slate-400">
+              Don't have an account?{' '}
+              <Link to="/register" className="font-semibold text-brand-600 hover:text-brand-700 transition">
+                Create one
+              </Link>
+            </p>
+          </div>
         </div>
-      </div>
+
+        <p className="text-center text-xs text-slate-300 mt-6">
+          Demo: demo@biotwin.ai / demo123456
+        </p>
+      </motion.div>
     </div>
   );
 }

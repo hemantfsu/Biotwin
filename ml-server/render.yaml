@@ -1,0 +1,12 @@
+# Render Blueprint — ML Server (Python/FastAPI + Docker)
+services:
+  - type: web
+    name: biotwin-ml
+    runtime: docker
+    plan: free
+    region: oregon
+    rootDir: ml-server
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: PORT
+        value: "8000"

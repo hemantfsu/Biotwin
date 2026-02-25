@@ -13,12 +13,11 @@ venv/
 frontend/build/
 dist/
 
-# Model artefacts (large files)
+# Model artefacts (large files — top-level only)
 models/*.pkl
 models/*.h5
 models/*.tflite
-ml-server/models/*.pkl
-ml-server/models/*.h5
+# NOTE: ml-server/models/ is NOT ignored — those are needed for deployment
 
 # IDE
 .vscode/
