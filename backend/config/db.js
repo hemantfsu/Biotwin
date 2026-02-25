@@ -1,4 +1,8 @@
 const mongoose = require('mongoose');
+const dns = require('dns');
+
+// Use Google public DNS so Atlas SRV records resolve on any network
+dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 /**
  * Connect to MongoDB (supports Railway MONGO_URL & standard MONGO_URI).
